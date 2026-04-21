@@ -44,6 +44,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<Perfume.Services.TokenService>();
 
+builder.Services.AddHttpClient<GeminiService>();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
