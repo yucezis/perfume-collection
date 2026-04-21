@@ -18,45 +18,59 @@ namespace Perfume.Services
 
         public async Task<string> AskAsync(string prompt)
         {
-            var requestBody = new
+            try
             {
-                system_instruction = new
+                var requestBody = new
                 {
-                    parts = new[]
+                    system_instruction = new
                     {
-                        new { text = "Sen uzman ve zarif bir parfümörsün (koku danışmanı)." +
-                                     "Kullanıcılara parfüm koleksiyonları, koku notaları (odunsu, çiçeksi, baharatlı vb.) " +
-                                     "ve tarzlarına uygun parfümler hakkında profesyonel, şık ve kısa cevaplar ver." +
-                                     "Sadece parfüm, kozmetik ve koku dünyası hakkında konuş. " +
-                                     "İlgisiz (matematik, yazılım, tarih vb.) soruları kibarca reddet." 
+                        parts = new[]
+                        {
+                    new { text = "Sen uzman ve zarif bir parfümörsün (koku danışmanı)." +
+                                 "Kullanıcılara parfüm koleksiyonları, koku notaları (odunsu, çiçeksi, baharatlı vb.) " +
+                                 "ve tarzlarına uygun parfümler hakkında profesyonel, şık ve kısa cevaplar ver." +
+                                 "Sadece parfüm, kozmetik ve koku dünyası hakkında konuş. " +
+                                 "İlgisiz (matematik, yazılım, tarih vb.) soruları kibarca reddet."
                         }
                     }
-                },
-                   contents = new[]
-                   {
-                       new { parts = new[] { new { text = prompt } } }
-                   }
-            };
+                    },
+                    contents = new[]
+                    {
+                        new { parts = new[] { new { text = prompt } } }
+                    }
+                };
 
-            var json = JsonSerializer.Serialize(requestBody);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var json = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var url = $"{BASE_URL}?key={_apiKey}";
 
-            var url = $"{BASE_URL}?key={_apiKey}";
-            var response = await _httpClient.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
+                var response = await _httpClient.PostAsync(url, content);
+                response.EnsureSuccessStatusCode();
 
-            var responseJson = await response.Content.ReadAsStringAsync();
+                var responseJson = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(responseJson);
 
-            using var doc = JsonDocument.Parse(responseJson);
+                var text = doc.RootElement
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts")[0]
+                    .GetProperty("text")
+                    .GetString();
 
-            var text = doc.RootElement
-                .GetProperty("candidates")[0]
-                .GetProperty("content")
-                .GetProperty("parts")[0]
-                .GetProperty("text")
-                .GetString();
-
-            return text ?? "yanıt alınamadı";
+                return text ?? "Yanıt alınamadı.";
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            {
+                return "Çok fazla istek gönderildi. Lütfen biraz bekleyin.";
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return "API anahtarı geçersiz. Lütfen kontrol edin.";
+            }
+            catch (Exception ex)
+            {
+                return $"Hata oluştu: {ex.Message}";
+            }
         }
     }
 }
