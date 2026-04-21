@@ -33,6 +33,7 @@ Perfume/
 ├── Controllers/
 │   ├── BrandController.cs
 │   ├── CollectionItemController.cs
+│   ├── GeminiController.cs
 │   ├── NoteController.cs
 │   ├── PerfumeController.cs
 │   ├── AuthController.cs
@@ -45,6 +46,11 @@ Perfume/
 │   ├── AuthResponseDTO.cs
 │   ├── LoginDTO.cs
 │   └── RegisterDTO.cs
+├── Exceptions/
+│   ├── AppException.cs
+│   ├── NotFoundException.cs
+├── Handlers/
+│   ├── GlobalExceptionHandler.cs
 ├── Models/
 │   ├── Enum/
 │   │   ├── NoteType.cs
@@ -55,6 +61,7 @@ Perfume/
 │   ├── Perfume.cs
 │   └── PerfumeNotes.cs
 ├── Services/
+│   ├── GeminiService.cs
 │   ├── ITokenService.cs
 │   └── TokenService.cs
 ├── Migrations/
@@ -139,12 +146,12 @@ This project will never be "done." Every new design pattern, architecture concep
 ### Mid-Term
 
 - [x] **JWT Authentication & Authorization** — Add token-based auth with role-based access control
-- [ ] **Global Exception Handling** — Centralize all error handling into a single middleware pipeline
+- [x] **Global Exception Handling** — Centralize all error handling into a single middleware pipeline
 
 ### Long-Term
 
 - [ ] **Unit & Integration Tests** — Build a test suite using xUnit
-- [ ] **AI Integration** — Perfume recommendation engine based on personal collection and scent preferences 
+- [x] **AI Integration** — Perfume recommendation engine based on personal collection and scent preferences 
 
 ---
 
