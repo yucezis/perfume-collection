@@ -21,6 +21,14 @@ namespace Perfume.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        [AllowAnonymous] 
+        public ActionResult<IEnumerable<Brand>> GetAll()
+        {
+            var brands = _context.Brands.ToList();
+            return Ok(brands);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public ActionResult<Brand> GetById(int id)
